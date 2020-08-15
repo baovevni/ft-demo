@@ -7,7 +7,7 @@ package tests;
 4. Make sure that we can play a game and the balance updates.
 5. Make sure we can buy a lottery ticket and balance is updated.
  */
-// in the next releases to be added
+
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -23,25 +23,30 @@ public class DemoTest {
     WebDriver driver;
     String browserType = "chrome";
     String password = "demo123";
-    String email = "b12t@ft.com";
+    String email = "b33t@ft.com";
     String prefix = "+373";
     String phone = "69629696";
     String name = "Evgheni Barducov";
     String accountPassword = "Ddemo!123";
     String expectedConfirmation = "✨ Your registration is complete! ✨";
-    boolean registrationSuccessful = false;
     String expectedLoginConfirmation = "FAST TRACK CRM - Built for Casino, Sports and Lottery";
-    boolean loginSuccessful = false;
+    String expectedAlertText = "Lower your bet to play again.";
     String expectedDepositConfirmation = "✨ Your deposit was successful! ✨";
-    boolean depositSuccessful = false;
-    boolean depositMatches = false;
+    boolean registrationSuccessful = false;
+    boolean loginSuccessful = false;
+    boolean alertSuccessful = false;
+    boolean depositSuccessful;
+    boolean depositMatches ;
+
+    // Login method {reused}
+    public void login(){
+        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+    }
 
     @Test(priority = 0) // 1. Make sure we can register on the casino
     public void newUserRegistration() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         // New user registration
         driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(1) > button")).click();
         driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > footer > button")).click();
@@ -58,48 +63,81 @@ public class DemoTest {
         Thread.sleep(1000);
         // Get registration confirmation
         String actualConfirmation = driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > h3")).getText();
-        System.out.println("Registration PASS ->->->-> " + actualConfirmation);
 
         // Assert confirmation successful
         if (actualConfirmation.equals(expectedConfirmation)) {
+            System.out.println("Registration PASS ->->->-> " + actualConfirmation);
             registrationSuccessful = true;
         }
         Assert.assertTrue(registrationSuccessful);
     }
-
-    @Test(priority = 1) // 2. Make sure we can log in with an existing user
-    public void loginWithExistingAccount() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
-        // Login with existing account
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
+    @Test(priority = 1) // 1. Make sure we can register on the casino
+    public void newUserRegistrationWithSameEmail() throws InterruptedException {
+        // New user registration
+        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(1) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > footer > button")).click();
         driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
         driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div.column.column--wrap > input")).sendKeys(prefix);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(2) > div > input")).sendKeys(phone);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(3) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div:nth-child(1) > div > input")).sendKeys(name);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(accountPassword);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        Thread.sleep(1000);
+        // Get registration confirmation
+        String actualConfirmation = driver.switchTo().alert().getText();
+        // Assert confirmation successful
+        if (actualConfirmation.equals("Email already registered")) {
+            System.out.println("Registration with same email is not possible PASS ->->->-> " + actualConfirmation);
+            registrationSuccessful = true;
+        }
+        Assert.assertTrue(registrationSuccessful);
+    }
+    @Test(priority = 2) // 2. Make sure we can log in with an existing user
+    public void loginWithExistingAccount() throws InterruptedException {
+        // Login with existing account
+        login();
         // Assert login successful
         Thread.sleep(1000);
         String loginConfirmation = driver.findElement(By.cssSelector("#__layout > div > main > div.container.big > div > div > h1")).getText();
-        System.out.println("Login PASS ->->->-> " + loginConfirmation);
 
         // Assert confirmation successful
         if (loginConfirmation.equals(expectedLoginConfirmation)) {
+            System.out.println("Login PASS ->->->-> " + loginConfirmation);
             loginSuccessful = true;
+        }else{
+            System.out.println("Login FAIL ->->->-> " + loginConfirmation);
+            loginSuccessful = false;
         }
         Assert.assertTrue(loginSuccessful);
     }
 
-    @Test(priority = 2) // 3. Make sure we can deposit and check so the balance matches.
-    public void depositAmountWithoutBonus() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+    @Test(priority = 3) // 4.1. Make sure that we can't play a game with Zero balance.
+    public void playGameWithZeroBalance() throws InterruptedException {
         // Login with existing account
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        login();
+        // Open menu
+        driver.findElement(By.cssSelector("#navigation > svg")).click();
+        // Select Game
+        driver.findElement(By.cssSelector("#__layout > div > header > div.sidebar.sidebar--show > div:nth-child(1) > a")).click();
+        // Click on the cat
+        driver.findElement(By.cssSelector("#__layout > div > main > div.casino-page > div > div > div.game__buttons > div:nth-child(1) > div:nth-child(1) > img")).click();
+        // Get Alert Text
+        String actualAlertText = driver.switchTo().alert().getText();
+        // Assert alert
+        if (actualAlertText.equals(expectedAlertText)) {
+            alertSuccessful = true;
+        }
+        Assert.assertTrue(alertSuccessful);
+    }
+
+    @Test(priority = 4) // 3. Make sure we can deposit and check so the balance matches.
+    public void depositAmountWithoutBonus() throws InterruptedException{
+        // Login with existing account
+        login();
         // Click on current amount
         driver.findElement(By.cssSelector("#__layout > div > main > div.deposit-wrapper > button")).click();
         // Select CARD payment method
@@ -116,11 +154,13 @@ public class DemoTest {
             depositSuccessful = true;
         } else {
             System.out.println("Deposit FAIL ->->->-> " + actualDepositConfirmation);
-            depositSuccessful = false;
         }
         Assert.assertTrue(depositSuccessful);
         // Close pop-up
+        Thread.sleep(1000);
         driver.findElement(By.cssSelector("#__layout > div > div.modal > div.modal__wrapper > div > div.modal__body > div:nth-child(4) > div > button")).click();
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#fasttrack-crm > div:nth-child(1) > div.small-notifications-wrapper > div > div.close-btn")).click();
         // Assert Balance Matches
         String expectedBalanceAfterDeposit = "€100.00";
         String actualDepositBalance = driver.findElement(By.cssSelector("#__layout > div > main > div.deposit-wrapper > button")).getText();
@@ -128,24 +168,16 @@ public class DemoTest {
             depositMatches = true;
             System.out.println("Balance PASS ->->->-> " + actualDepositBalance);
         } else {
-            System.out.println("Balance FAIL ->->->-> " + actualDepositBalance);
-            depositMatches = false;
+            System.out.println("Balance FAIL ->->->-> " + actualDepositBalance + "Expected Balance: " + expectedBalanceAfterDeposit);
         }
         Assert.assertTrue(depositMatches);
         // Close pop-up
-        driver.findElement(By.cssSelector("#fasttrack-crm > div:nth-child(1) > div.small-notifications-wrapper > div > div.close-btn")).click();
     }
 
-    @Test(priority = 3) // 3. Make sure we can deposit and check so the balance matches.
-    public void depositAmountWithBonus() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
+    @Test(priority = 5) // 3. Make sure we can deposit and check so the balance matches.
+    public void depositAmountWithBonus() throws InterruptedException{
         // Login with existing account
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        login();
         // Click on current amount
         driver.findElement(By.cssSelector("#__layout > div > main > div.deposit-wrapper > button")).click();
         // Select Welcome bonus 200% to be applied
@@ -164,35 +196,33 @@ public class DemoTest {
             depositSuccessful = true;
         } else {
             System.out.println("Deposit FAIL ->->->-> " + actualDepositConfirmation);
-            depositSuccessful = false;
         }
         Assert.assertTrue(depositSuccessful);
-        // Close pop-ups
+        // Close pop-up
+        Thread.sleep(1000);
         driver.findElement(By.cssSelector("#__layout > div > div.modal > div.modal__wrapper > div > div.modal__body > div:nth-child(4) > div > button")).click();
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#fasttrack-crm > div:nth-child(1) > div.inbox-wrapper > div.inbox > div.close-btn")).click();
+        Thread.sleep(1000);
         driver.findElement(By.cssSelector("#fasttrack-crm > div:nth-child(1) > div.small-notifications-wrapper > div > div.close-btn")).click();
         // Assert Balance Matches
         String expectedBalanceAfterDeposit = "€130.00";
         String actualDepositBalance = driver.findElement(By.cssSelector("#__layout > div > main > div.deposit-wrapper > button")).getText();
         if (actualDepositBalance.equals(expectedBalanceAfterDeposit)) {
-            depositMatches = true;
             System.out.println("Balance PASS ->->->-> " + actualDepositBalance);
+            depositMatches = true;
         } else {
             System.out.println("Balance FAIL ->->->-> " + actualDepositBalance + "Expected Balance: " + expectedBalanceAfterDeposit);
-            depositMatches = false;
         }
         Assert.assertTrue(depositMatches);
+        // Close pop-up
+
     }
 
-    @Test(priority = 4) // 4. Make sure that we can play a game and the balance updates.
+    @Test(priority = 6) // 4. Make sure that we can play a game and the balance updates.
     public void playGame() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         // Login with existing account
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        login();
         // Open menu
         driver.findElement(By.cssSelector("#navigation > svg")).click();
         // Select Game
@@ -207,19 +237,14 @@ public class DemoTest {
         currentDebit = driver.findElement(By.cssSelector("#__layout > div > main > div.deposit-wrapper > button")).getText();
         System.out.println("New debit is ->->->-> " + currentDebit);
         // Close pop-up
+        Thread.sleep(1000);
         driver.findElement(By.cssSelector("#fasttrack-crm > div:nth-child(1) > div.small-notifications-wrapper > div > div.close-btn")).click();
 
     }
-    @Test(priority = 5) // 5. Make sure we can buy a lottery ticket and balance is updated.
+    @Test(priority = 7) // 5. Make sure we can buy a lottery ticket and balance is updated.
     public void buyLotteryTicket() throws InterruptedException {
-        // Enter into the system
-        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
-        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
-        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
         // Login with existing account
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        login();
         // Open menu
         driver.findElement(By.cssSelector("#navigation > svg")).click();
         // Select Lottery
@@ -251,13 +276,18 @@ public class DemoTest {
 
     @BeforeMethod
     public void setUp() {
+        // Define the browser, open page
         driver = utilities.DriverFactory.open(browserType);
         driver.get("https://demo.ft-crm.com/password");
+        // Enter into the system
+        driver.findElement(By.cssSelector("#__layout > div > div > form > input[type=password]")).sendKeys(password);
+        driver.findElement(By.cssSelector("#__layout > div > div > form > div > button")).click();
+        driver.manage().timeouts().implicitlyWait(1, TimeUnit.SECONDS);
     }
 
-//    @AfterMethod
-//    public void tearDown(){
-//        driver.quit();
-//    }
+    @AfterMethod
+    public void tearDown(){
+        driver.quit();
+    }
 
 }
