@@ -38,29 +38,10 @@ public class DemoTest {
     boolean depositSuccessful;
     boolean depositMatches ;
 
-    // Login method {reused}
-    public void login(){
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-    }
-
     @Test(priority = 0) // 1. Make sure we can register on the casino
     public void newUserRegistration() throws InterruptedException {
         // New user registration
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(1) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > footer > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div.column.column--wrap > input")).sendKeys(prefix);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(2) > div > input")).sendKeys(phone);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(3) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div:nth-child(1) > div > input")).sendKeys(name);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        Thread.sleep(1000);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(accountPassword);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        Thread.sleep(1000);
+        registerNewUser();
         // Get registration confirmation
         String actualConfirmation = driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > h3")).getText();
 
@@ -74,19 +55,7 @@ public class DemoTest {
     @Test(priority = 1) // 1. Make sure we can register on the casino
     public void newUserRegistrationWithSameEmail() throws InterruptedException {
         // New user registration
-        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(1) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > footer > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div.column.column--wrap > input")).sendKeys(prefix);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(2) > div > input")).sendKeys(phone);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(3) > button")).click();
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div:nth-child(1) > div > input")).sendKeys(name);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        Thread.sleep(1000);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(accountPassword);
-        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
-        Thread.sleep(1000);
+        registerNewUser();
         // Get registration confirmation
         String actualConfirmation = driver.switchTo().alert().getText();
         // Assert confirmation successful
@@ -273,6 +242,29 @@ public class DemoTest {
 
     }
 
+    // Login method {reused}
+    public void login(){
+        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(2) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+    }
+
+    // Register new user method {reused}
+    public void registerNewUser() throws InterruptedException{
+        driver.findElement(By.cssSelector("#__layout > div > footer > div > div:nth-child(1) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > div > footer > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(email);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div.column.column--wrap > input")).sendKeys(prefix);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(2) > div > input")).sendKeys(phone);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div:nth-child(3) > button")).click();
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div:nth-child(1) > div > input")).sendKeys(name);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        Thread.sleep(1000);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div > div > input")).sendKeys(accountPassword);
+        driver.findElement(By.cssSelector("#__layout > div > div > div.modal__wrapper > div > div.modal__body > form > section > div > div > div.column.column--wrap > button")).click();
+        Thread.sleep(1000);
+    }
 
     @BeforeMethod
     public void setUp() {
