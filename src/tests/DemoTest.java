@@ -1,8 +1,8 @@
 package tests;
 
 /*
-1. Make sure we can register on the casino
-2. Make sure we can log in with an existing user
+1. Make sure we can register on the casino.
+2. Make sure we can log in with an existing user.
 3. Make sure we can deposit and check so the balance matches.
 4. Make sure that we can play a game and the balance updates.
 5. Make sure we can buy a lottery ticket and balance is updated.
